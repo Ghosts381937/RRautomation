@@ -7,6 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import requests
 import getpass
+import threading
+global str
 driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get('https://rivalregions.com/')
@@ -14,6 +16,7 @@ def wait(path):#當該xpath出現時繼續下個動作,否則等完100秒
     WebDriverWait(driver,100).until(
         EC.presence_of_element_located((By.XPATH,path))
     )
+    time.sleep(1)
 def login():
     while True:
         try:
@@ -83,17 +86,18 @@ def ispremium():#高級會員回傳1,否則回傳0
         if(driver.current_url == 'https://rivalregions.com/#overview'):
             wait('//*[@id="header_money"]/div')
             break
-    driver.find_element_by_xpath('//*[@id="header_money"]/div').click()
+    driver.find_element_by_xpath('//*[@id="header_money"]/div').click()#點擊右上角課金選項
+    #獲取是否為高級會員字串
     wait('//*[@id="header_slide_inner"]/div[3]/form[3]/div[3]/div/h1')
     member = driver.find_element_by_xpath('//*[@id="header_slide_inner"]/div[3]/form[3]/div[3]/div/h1').text
     if member[0:2] == '續訂':
         print('高級會員模式.....')
     else:
         print('普通會員模式.....')
+'''
 def autoperk(type,isgold):
     if isgold == 0:
         pass
-
 def howtoperk():
     while True:
         try:
@@ -114,11 +118,34 @@ def howtoperk():
         except:
             print('錯誤輸入')
     return [typ,isgold]
-
-
+'''
+def minegold(energy_num):
+    wait('//*[@id="header_menu"]/div[9]')
+    driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
+    wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]')
+    driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').click()# 自動模式
+    wait('//*[@id="header_menu"]/div[6]')
+    driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click()# 倉庫
+    wait('//*[@id="content"]/div[11]/div[3]/span')
+    Enegy = driver.find_element_by_xpath('//*[@id="content"]/div[11]/div[3]/span').text# 能量飲料目前數量
+    while True:
+        if int(Enegy) <= 600:
+            driver.find_element_by_xpath('//*[@id="content"]/div[11]').click()# 點擊飲料打開購買欄
+            wait('//*[@id="storage_market"]/div[2]/div[3]/input')
+            num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[3]/input')
+            num.clear()
+            num.send_keys(energy_num)
+            driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
+        time.sleep(610)# 等10分鐘
 def main():
     login()
+    '''
     perk = howtoperk()
+    autoperk(perk[0],perk[1])
+    '''
+    minegold(int(input('沒能量飲料時購買數量：')))
 main()
 
 
+
+        
