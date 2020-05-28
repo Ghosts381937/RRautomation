@@ -67,5 +67,11 @@ def ispremium():#高級會員回傳1,否則回傳0
         print('高級會員模式.....')
     else:
         print('普通會員模式.....')
-login()
+#def autoperk(type):
+
+def main():
+    login()
+    #autoperk(input('請輸入欲升級的技能(1.STR 2.EDU 3.END'))
+main()
+
 
