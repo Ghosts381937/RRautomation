@@ -8,8 +8,8 @@ import time
 import requests
 import getpass
 driver = webdriver.Chrome()
-driver.get('https://rivalregions.com/')
 driver.maximize_window()
+driver.get('https://rivalregions.com/')
 def login():
     while True:
         try:
