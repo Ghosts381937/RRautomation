@@ -10,6 +10,10 @@ import getpass
 driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get('https://rivalregions.com/')
+def wait(path):#當該xpath出現時繼續下個動作,否則等完100秒
+    WebDriverWait(driver,100).until(
+        EC.presence_of_element_located((By.XPATH,path))
+    )
 def login():
     while True:
         try:
@@ -38,10 +42,10 @@ def login():
         email = driver.find_element_by_xpath('//*[@id="identifierId"]')
         email.send_keys(username)
         email.send_keys(Keys.ENTER)#enter
-        time.sleep(1)#google帳號密碼輸入在不同頁面所以等1秒
+        wait('//*[@id="password"]/div[1]/div/div[1]/input')#google帳號密碼輸入在不同頁面所以等待
         pas = driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
         pas.send_keys(password)
-        pas.submit()
+        pas.send_keys(Keys.ENTER)
     #vk
     else:
         driver.find_element_by_xpath('//*[@id="sa_add2"]/div[2]/a[3]/div').click()
@@ -50,4 +54,18 @@ def login():
         pas = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[7]')
         pas.send_keys(password)
         pas.submit()
+def ispremium():#高級會員回傳1,否則回傳0
+    #確保連結在遊戲主頁面
+    while True:
+        if(driver.current_url == 'https://rivalregions.com/#overview'):
+            wait('//*[@id="header_money"]/div')
+            break
+    driver.find_element_by_xpath('//*[@id="header_money"]/div').click()
+    wait('//*[@id="header_slide_inner"]/div[3]/form[3]/div[3]/div/h1')
+    member = driver.find_element_by_xpath('//*[@id="header_slide_inner"]/div[3]/form[3]/div[3]/div/h1').text
+    if member[0:2] == '續訂':
+        print('高級會員模式.....')
+    else:
+        print('普通會員模式.....')
 login()
+
