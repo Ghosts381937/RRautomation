@@ -31,29 +31,52 @@ def login():
     #fb
     if account == 1:
         driver.find_element_by_tag_name('div.sa_sn.imp.float_left').click()#點選fb登入
-        email = driver.find_element_by_xpath('//*[@id="email"]')#取得輸入email框位置
-        email.send_keys(username)
-        pas = driver.find_element_by_xpath('//*[@id="pass"]')#取得輸入password框位置
-        pas.send_keys(password)
-        pas.submit()#enter
+        while True:
+            try:
+                wait('//*[@id="email"]')
+                email = driver.find_element_by_xpath('//*[@id="email"]')#取得輸入email框位置
+                email.send_keys(username)
+                pas = driver.find_element_by_xpath('//*[@id="pass"]')#取得輸入password框位置
+                pas.send_keys(password)
+                pas.submit()#enter
+                break
+            except:
+                print('錯誤!重新登入中')
     #google
     elif account == 2:
         driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo').click()
-        email = driver.find_element_by_xpath('//*[@id="identifierId"]')
-        email.send_keys(username)
-        email.send_keys(Keys.ENTER)#enter
-        wait('//*[@id="password"]/div[1]/div/div[1]/input')#google帳號密碼輸入在不同頁面所以等待
-        pas = driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
-        pas.send_keys(password)
-        pas.send_keys(Keys.ENTER)
+        while True:
+            try:
+                wait('//*[@id="identifierId"]')
+                email = driver.find_element_by_xpath('//*[@id="identifierId"]')
+                email.send_keys(username)
+                email.send_keys(Keys.ENTER)#enter
+                break
+            except:
+                print('錯誤!重新登入中')
+        while True:
+            try:
+                wait('//*[@id="password"]/div[1]/div/div[1]/input')#等待下個頁面跳出
+                pas = driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
+                pas.send_keys(password)
+                pas.send_keys(Keys.ENTER)
+                break
+            except:
+                print('錯誤!重新登入中')   
     #vk
     else:
         driver.find_element_by_xpath('//*[@id="sa_add2"]/div[2]/a[3]/div').click()
-        email = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[6]')
-        email.send_keys(username)
-        pas = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[7]')
-        pas.send_keys(password)
-        pas.submit()
+        while True:
+            try:
+                wait('//*[@id="login_submit"]/div/div/input[6]')
+                email = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[6]')
+                email.send_keys(username)
+                pas = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[7]')
+                pas.send_keys(password)
+                pas.submit()
+                break
+            except:
+                pass
 def ispremium():#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
     while True:
@@ -67,11 +90,35 @@ def ispremium():#高級會員回傳1,否則回傳0
         print('高級會員模式.....')
     else:
         print('普通會員模式.....')
-#def autoperk(type):
+def autoperk(type,isgold):
+    if isgold == 0:
+        pass
+
+def howtoperk():
+    while True:
+        try:
+            typ = int(input('請輸入欲升級的技能(1.STR 2.EDU 3.END):'))
+            if typ!=1 and typ!=2 and typ!=3:
+                print('錯誤輸入')
+            else:
+                break
+        except:
+            print('錯誤輸入')
+    while True:
+        try:
+            isgold = int(input('是否使用黃金升級技能(0.NO 1.YES):'))
+            if isgold!=1 and isgold!=2 and isgold!=3:
+                print('錯誤輸入')
+            else:
+                break
+        except:
+            print('錯誤輸入')
+    return [typ,isgold]
+
 
 def main():
     login()
-    #autoperk(input('請輸入欲升級的技能(1.STR 2.EDU 3.END'))
+    perk = howtoperk()
 main()
 
 
