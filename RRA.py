@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import requests
 import getpass
+import math
 driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get('https://rivalregions.com/')
@@ -37,13 +38,22 @@ def ispremium():#高級會員回傳1,否則回傳0
     else:
         print('普通會員模式.....')
         return 0
-def getchainfo():
+def getchainfo():#get角色資料
     driver.get('https://rivalregions.com/')
     lv = int(driver.find_element_by_xpath('//*[@id="index_exp_level"]').text)
     strn = int(driver.find_element_by_xpath('//*[@id="index_perks_list"]/div[4]/div[2]').text)
     edu = int(driver.find_element_by_xpath('//*[@id="index_perks_list"]/div[5]/div[2]').text)
     end = int(driver.find_element_by_xpath('//*[@id="index_perks_list"]/div[6]/div[2]').text)
     return {'lv':lv,'str':strn,'edu':edu,'end':end}
+def single_costenergy(end):#單次派兵消耗能量
+    if end <50:
+        return 9
+    elif end<75:
+        return 8
+    elif end<100:
+        return 7
+    else:
+        return 6
 def login():
     while True:
         try:
@@ -149,8 +159,9 @@ def minegold(energy_num):
         num.send_keys(energy_num)
         driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
 def fullautowar(weapon_type,weapon_num):
-    
-    maxstation = 
+    damage = [75,2000,6000]
+    chainfo = getchainfo()
+    maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
     wait('//*[@id="header_menu"]/div[16]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div')
@@ -165,7 +176,7 @@ def fullautowar(weapon_type,weapon_num):
     if weapon_type == 1:
         wait('//*[@id="content"]/div[15]/div[3]/span')
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[15]/div[3]/span').text) # 戰機數量
-        if weapon_now <= 220:
+        if weapon_now <= maxstation:
             wait('//*[@id="content"]/div[15]')
             driver.find_element_by_xpath('//*[@id="content"]/div[15]').click() # 點擊戰機打開購買欄
             # 輸入並購買
@@ -176,7 +187,7 @@ def fullautowar(weapon_type,weapon_num):
     if weapon_type == 2:
         wait('//*[@id="content"]/div[20]/div[3]/span')
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[20]/div[3]/span').text) # 月球戰車數量
-        if weapon_now <= 220:
+        if weapon_now <= maxstation:
             wait('//*[@id="content"]/div[20]')
             driver.find_element_by_xpath('//*[@id="content"]/div[20]').click() # 點擊月球戰車打開購買欄
             # 輸入並購買
@@ -187,7 +198,7 @@ def fullautowar(weapon_type,weapon_num):
     if weapon_type == 3:
         wait('//*[@id="content"]/div[19]/div[3]/span')
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[19]/div[3]/span').text) # 無人機數量
-        if weapon_now <= 220:
+        if weapon_now <= maxstation:
             wait('//*[@id="content"]/div[19]')
             driver.find_element_by_xpath('//*[@id="content"]/div[19]').click() # 點擊無人機打開購買欄
             # 輸入並購買
