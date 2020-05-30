@@ -160,7 +160,7 @@ def minegold(energy_num):
     Enegy = int(driver.find_element_by_xpath('//*[@id="content"]/div[11]/div[3]/span').text)# 能量飲料目前數量
     if Enegy <= 600:
         Energy_buy(energy_num)
-def halfautowar(weapon_type,weapon_num,energy_num):
+def halfautowar(weapon_type,weapon_num):
     damage = [75,2000,6000]
     chainfo = getchainfo()
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
@@ -186,7 +186,6 @@ def halfautowar(weapon_type,weapon_num,energy_num):
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
-            Energy_buy(energy_num)
     if weapon_type == 2:
         wait('//*[@id="content"]/div[20]/div[3]/span')
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[20]/div[3]/span').text) # 月球戰車數量
@@ -198,7 +197,6 @@ def halfautowar(weapon_type,weapon_num,energy_num):
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
-            Energy_buy(energy_num)
     if weapon_type == 3:
         wait('//*[@id="content"]/div[19]/div[3]/span')
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[19]/div[3]/span').text) # 無人機數量
@@ -210,7 +208,6 @@ def halfautowar(weapon_type,weapon_num,energy_num):
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
-            Energy_buy(energy_num)
 def main():
     login()
     '''
@@ -233,7 +230,7 @@ def main():
         except :
            print('錯誤!請重新輸入')
     
-    halfautowar(weapon_type,weapon_num,energy_num)
+    halfautowar(weapon_type,weapon_num)
     '''
     while True:
     if iselemexit('//*[@id="header_my_fill_bar_countdown"]'):
