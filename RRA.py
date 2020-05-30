@@ -221,13 +221,13 @@ def main():
                 break
             else:
                 print('錯誤!請重新輸入')
-        except :
+        except:
             print('錯誤!請重新輸入')
     while True:
         try:
             weapon_type = int(input('請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：'))
             weapon_num = int(input('購買數量：'))
-        except :
+        except:
            print('錯誤!請重新輸入')
     
     halfautowar(weapon_type,weapon_num)
