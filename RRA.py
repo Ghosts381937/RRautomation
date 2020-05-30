@@ -142,6 +142,13 @@ def howtoperk():
             print('錯誤輸入')
     return [typ,isgold]
 '''
+def Energy_buy(energy_num):
+    driver.find_element_by_xpath('//*[@id="content"]/div[11]').click()# 點擊飲料打開購買欄
+    wait('//*[@id="storage_market"]/div[2]/div[3]/input')
+    num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[3]/input')#抓購買數量框
+    num.clear()
+    num.send_keys(energy_num)
+    driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
 def minegold(energy_num):
     wait('//*[@id="header_menu"]/div[9]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
@@ -152,13 +159,8 @@ def minegold(energy_num):
     wait('//*[@id="content"]/div[11]/div[3]/span')
     Enegy = int(driver.find_element_by_xpath('//*[@id="content"]/div[11]/div[3]/span').text)# 能量飲料目前數量
     if Enegy <= 600:
-        driver.find_element_by_xpath('//*[@id="content"]/div[11]').click()# 點擊飲料打開購買欄
-        wait('//*[@id="storage_market"]/div[2]/div[3]/input')
-        num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[3]/input')#抓購買數量框
-        num.clear()
-        num.send_keys(energy_num)
-        driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
-def fullautowar(weapon_type,weapon_num):
+        Energy_buy(energy_num)
+def halfautowar(weapon_type,weapon_num,energy_num):
     damage = [75,2000,6000]
     chainfo = getchainfo()
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
@@ -166,8 +168,8 @@ def fullautowar(weapon_type,weapon_num):
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div')
     driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() # 軍事演習
-    wait('//*[@id="send_b_wrap"]/div[3]')
-    driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[3]').click() # 全自動
+    wait('//*[@id="send_b_wrap"]/div[4]')
+    driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]').click() # 半自動
     driver.switch_to_alert().accept() # 訊息框確認
     wait('//*[@id="slide_close"]')
     driver.find_element_by_xpath('//*[@id="slide_close"]').click() # 返回(X)
@@ -184,6 +186,7 @@ def fullautowar(weapon_type,weapon_num):
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
+            Energy_buy(energy_num)
     if weapon_type == 2:
         wait('//*[@id="content"]/div[20]/div[3]/span')
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[20]/div[3]/span').text) # 月球戰車數量
@@ -195,6 +198,7 @@ def fullautowar(weapon_type,weapon_num):
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
+            Energy_buy(energy_num)
     if weapon_type == 3:
         wait('//*[@id="content"]/div[19]/div[3]/span')
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[19]/div[3]/span').text) # 無人機數量
@@ -206,6 +210,7 @@ def fullautowar(weapon_type,weapon_num):
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
+            Energy_buy(energy_num)
 def main():
     login()
     '''
@@ -228,7 +233,7 @@ def main():
         except :
            print('錯誤!請重新輸入')
     
-    fullautowar(weapon_type,weapon_num)
+    halfautowar(weapon_type,weapon_num,energy_num)
     '''
     while True:
     if iselemexit('//*[@id="header_my_fill_bar_countdown"]'):
