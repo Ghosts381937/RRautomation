@@ -7,14 +7,18 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import requests
 import getpass
-import threading
-global str
 driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get('https://rivalregions.com/')
-def wait(path):#當該xpath出現時繼續下個動作,否則等完100秒
-    WebDriverWait(driver,100).until(
-        EC.presence_of_element_located((By.XPATH,path))
+def iselemexit(xpath):#檢測該元素是否存在 
+    try:
+        driver.find_element_by_xpath(xpath)
+        return True
+    except:
+        return False
+def wait(xpath):#當該xpath出現時繼續下個動作,否則等完30秒
+    WebDriverWait(driver,30).until(
+        EC.presence_of_element_located((By.XPATH,xpath))
     )
     time.sleep(1)
 def login():
@@ -136,16 +140,42 @@ def minegold(energy_num):
             num.clear()
             num.send_keys(energy_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
-        time.sleep(610)# 等10分鐘
+def war():
+    war_type = int(input(請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：))
+    war_num = int(input(購買數量：))
+    wait('//*[@id="header_menu"]/div[16]')
+    driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
+    wait('//*[@id="content"]/div[4]/div[2]/div')
+    driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() # 軍事演習
+    wait('//*[@id="send_b_wrap"]/div[3]')
+    driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[3]').click() # 全自動
+    driver.switch_to_alert().accept() # 訊息框確認
+    wait('//*[@id="slide_close"]')
+    driver.find_element_by_xpath('//*[@id="slide_close"]').click() # 返回(X)
+    wait('//*[@id="header_menu"]/div[6]')
+    driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click() # 倉庫
+    wait('//*[@id="content"]/div[20]/div[3]/span')
+    weapon = driver.find_element_by_xpath('//*[@id="content"]/div[20]/div[3]/span').text # 武器數量
+    while True:
+        if weapon <= 220:
+            wait('//*[@id="content"]/div[20]')
+            driver.find_element_by_xpath('//*[@id="content"]/div[20]').click() # 點擊月球戰車打開購買欄
+            # 輸入並購買
+            driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[5]/input').send_keys(war_num)
+            driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click() 
 def main():
     login()
     '''
     perk = howtoperk()
     autoperk(perk[0],perk[1])
     '''
-    minegold(int(input('沒能量飲料時購買數量：')))
+    energy_num = int(input('沒能量飲料時購買數量：'))
+    while True:
+        if iselemexit('//*[@id="header_my_fill_bar_countdown"]'):
+            minegold(energy_num)
 main()
 
 
 
-        
+
+   
