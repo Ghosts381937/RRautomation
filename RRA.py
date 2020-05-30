@@ -141,8 +141,8 @@ def minegold(energy_num):
             num.send_keys(energy_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
 def war():
-    war_type = int(input(請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：))
-    war_num = int(input(購買數量：))
+    war_type = int(input('請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：'))
+    war_num = int(input('購買數量：'))
     wait('//*[@id="header_menu"]/div[16]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div')
