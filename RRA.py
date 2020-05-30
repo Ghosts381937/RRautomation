@@ -117,10 +117,13 @@ def login():
                 break
             except:
                 pass
-'''
 def autoperk(type,isgold):
-    if isgold == 0:
-        pass
+    skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
+    ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
+    driver.get('https://rivalregions.com/')
+    wait('//*[@id="index_perks_list"]/div[4]/div[1]')#等待str元素出現
+    driver.find_element_by_xpath(skill[type-1]).click()
+    driver.find_element_by_xpath(ornot_gold[isgold]).click    
 def howtoperk():
     while True:
         try:
@@ -141,7 +144,6 @@ def howtoperk():
         except:
             print('錯誤輸入')
     return [typ,isgold]
-'''
 def Energy_buy(energy_num):
     driver.find_element_by_xpath('//*[@id="content"]/div[11]').click()# 點擊飲料打開購買欄
     wait('//*[@id="storage_market"]/div[2]/div[3]/input')
