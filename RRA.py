@@ -123,7 +123,7 @@ def autoperk(type,isgold):
     driver.get('https://rivalregions.com/')
     wait('//*[@id="index_perks_list"]/div[4]/div[1]')#等待str元素出現
     driver.find_element_by_xpath(skill[type-1]).click()
-    driver.find_element_by_xpath(ornot_gold[isgold]).click    
+    driver.find_element_by_xpath(ornot_gold[isgold]).click()  
 def howtoperk():
     while True:
         try:
@@ -137,7 +137,7 @@ def howtoperk():
     while True:
         try:
             isgold = int(input('是否使用黃金升級技能(0.NO 1.YES):'))
-            if isgold!=1 and isgold!=2 and isgold!=3:
+            if isgold!=0 and isgold!=1:
                 print('錯誤輸入')
             else:
                 break
@@ -145,35 +145,42 @@ def howtoperk():
             print('錯誤輸入')
     return [typ,isgold]
 def Energy_buy(energy_num):
-    driver.find_element_by_xpath('//*[@id="content"]/div[11]').click()# 點擊飲料打開購買欄
-    wait('//*[@id="storage_market"]/div[2]/div[3]/input')
-    num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[3]/input')#抓購買數量框
-    num.clear()
-    num.send_keys(energy_num)
-    driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
-def minegold(energy_num):
-    wait('//*[@id="header_menu"]/div[9]')
-    driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
-    wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]')
-    driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').click()# 自動模式
+    driver.get('https://rivalregions.com/')
     wait('//*[@id="header_menu"]/div[6]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click()# 倉庫
     wait('//*[@id="content"]/div[11]/div[3]/span')
     Enegy = int(driver.find_element_by_xpath('//*[@id="content"]/div[11]/div[3]/span').text)# 能量飲料目前數量
-    if Enegy <= 600:
-        Energy_buy(energy_num)
+    if Enegy <= 600: 
+        driver.find_element_by_xpath('//*[@id="content"]/div[11]').click()# 點擊飲料打開購買欄
+        wait('//*[@id="storage_market"]/div[2]/div[3]/input')
+        num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[3]/input')#抓購買數量框
+        num.clear()
+        num.send_keys(energy_num)
+        driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
+    else:
+        pass
+def autominegold(energy_num):
+    Energy_buy(energy_num)
+    driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
+    wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]')
+    driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').click()# 自動模式
+def minegold(energy_num):
+    Energy_buy(energy_num)
+    driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
+    wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]')
+    driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]').click()#普通挖金
 def halfautowar(weapon_type,weapon_num):
     damage = [75,2000,6000]
     chainfo = getchainfo()
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
+    print(maxstation)
+    driver.get('https://rivalregions.com/')
     wait('//*[@id="header_menu"]/div[16]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div')
     driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() # 軍事演習
     wait('//*[@id="send_b_wrap"]/div[4]')
     driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]').click() # 半自動
-    driver.switch_to_alert().accept() # 訊息框確認
-    wait('//*[@id="slide_close"]')
     driver.find_element_by_xpath('//*[@id="slide_close"]').click() # 返回(X)
     wait('//*[@id="header_menu"]/div[6]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click() # 倉庫
@@ -212,10 +219,6 @@ def halfautowar(weapon_type,weapon_num):
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
 def main():
     login()
-    '''
-    perk = howtoperk()
-    autoperk(perk[0],perk[1])
-    '''
     while True:
         try:
             energy_num = int(input('沒能量飲料時購買數量(請大於600)：'))
@@ -228,9 +231,21 @@ def main():
     while True:
         try:
             weapon_type = int(input('請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：'))
-            weapon_num = int(input('購買數量：'))
+            if weapon_type!=1 and weapon_type!=2 and weapon_type!=3:
+                print('錯誤!請重新輸入')
+            else:
+                break
         except:
-           print('錯誤!請重新輸入')
+            print('錯誤!請重新輸入')
+    while True:
+        try:
+            weapon_num = int(input('購買數量：'))
+            if weapon_num<600:
+                print('錯誤!請重新輸入')
+            else:
+                break
+        except:
+            print('錯誤!請重新輸入')
     
     halfautowar(weapon_type,weapon_num)
     '''
