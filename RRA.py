@@ -53,7 +53,7 @@ def single_costenergy(end):#單次派兵消耗能量
         return 7
     else:
         return 6
-def login():
+def login():#登入
     while True:
         try:
             account = int(input('請輸入帳號類型(1.FB 2.Google 3.VK):'))
@@ -116,14 +116,14 @@ def login():
                 break
             except:
                 pass
-def autoperk(type,isgold):
+def autoperk(type,isgold):#自動升技
     skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
     ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
     driver.get('https://rivalregions.com/')
     wait('//*[@id="index_perks_list"]/div[4]/div[1]')#等待str元素出現
     driver.find_element_by_xpath(skill[type-1]).click()
     driver.find_element_by_xpath(ornot_gold[isgold]).click()  
-def howtoperk():
+def howtoperk():#是否用金升技以及升哪個技能
     while True:
         try:
             typ = int(input('請輸入欲升級的技能(1.STR 2.EDU 3.END):'))
@@ -143,7 +143,7 @@ def howtoperk():
         except:
             print('錯誤輸入')
     return [typ,isgold]
-def Energy_buy(energy_num):
+def Energy_buy(energy_num):#買能量飲料
     driver.get('https://rivalregions.com/')
     wait('//*[@id="header_menu"]/div[6]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click()# 倉庫
@@ -158,11 +158,11 @@ def Energy_buy(energy_num):
         driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
     else:
         pass
-def weapon_buy(weapon_type,weapon_num):
-    damage = [75,2000,6000]
+def weapon_buy(weapon_type,weapon_num):#買武器
+    damage = [75,2000,6000]#3種武器分別的傷害
     chainfo = getchainfo()
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
-    driver.get('https://rivalregions.com/')
+    driver.get('https://rivalregions.com/')#回首頁
     wait('//*[@id="header_menu"]/div[6]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click() # 倉庫
     if weapon_type == 1:
@@ -198,17 +198,17 @@ def weapon_buy(weapon_type,weapon_num):
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
-def autominegold(energy_num):
+def autominegold(energy_num):#自動挖金
     Energy_buy(energy_num)
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
     wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]')
     driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').click()# 自動模式
-def minegold(energy_num):
+def minegold(energy_num):#手動挖金
     Energy_buy(energy_num)
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
     wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]')
     driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]').click()#普通挖金
-def halfautowar(weapon_type,weapon_num):
+def halfautowar(weapon_type,weapon_num):#半自動演習
     weapon_buy(weapon_type,weapon_num)
     wait('//*[@id="header_menu"]/div[16]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
@@ -216,9 +216,8 @@ def halfautowar(weapon_type,weapon_num):
     driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() # 軍事演習
     wait('//*[@id="send_b_wrap"]/div[4]')
     driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]').click() # 半自動
-def war(weapon_type,weapon_num):
+def war(weapon_type,weapon_num):#手動演習
     weapon_buy(weapon_type,weapon_num)
-    driver.get('https://rivalregions.com/')
     wait('//*[@id="header_menu"]/div[16]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div')
