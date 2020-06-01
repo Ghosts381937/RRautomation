@@ -7,6 +7,7 @@ import time
 import requests
 import getpass
 import math
+import threading
 driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get('https://rivalregions.com/')
@@ -23,10 +24,7 @@ def wait(xpath):#當該xpath出現時繼續下個動作,否則等完30秒
     time.sleep(1)
 def ispremium():#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
-    while True:
-        if(driver.current_url == 'https://rivalregions.com/#overview'):
-            wait('//*[@id="header_money"]/div')
-            break
+    wait('//*[@id="header_money"]/div')
     driver.find_element_by_xpath('//*[@id="header_money"]/div').click()#點擊右上角課金選項
     #獲取是否為高級會員字串
     wait('//*[@id="header_slide_inner"]/div[3]/form[3]/div[3]/div/h1')
@@ -117,12 +115,15 @@ def login():#登入
             except:
                 pass
 def autoperk(type,isgold):#自動升技
+    global lock
+    lock.acquire()
     skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
     ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
     driver.get('https://rivalregions.com/')
     wait('//*[@id="index_perks_list"]/div[4]/div[1]')#等待str元素出現
     driver.find_element_by_xpath(skill[type-1]).click()
     driver.find_element_by_xpath(ornot_gold[isgold]).click()  
+    lock.release()
 def howtoperk():#是否用金升技以及升哪個技能
     while True:
         try:
@@ -158,6 +159,7 @@ def Energy_buy(energy_num):#買能量飲料
         driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
     else:
         pass
+    driver.get('https://rivalregions.com/')
 def weapon_buy(weapon_type,weapon_num):#買武器
     damage = [75,2000,6000]#3種武器分別的傷害
     chainfo = getchainfo()
@@ -198,17 +200,28 @@ def weapon_buy(weapon_type,weapon_num):#買武器
             num.clear()
             num.send_keys(weapon_num)
             driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
+    driver.get('https://rivalregions.com/')
 def autominegold(energy_num):#自動挖金
+    global lock
+    lock.acquire()
     Energy_buy(energy_num)
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
     wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]')
     driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').click()# 自動模式
+    lock.release()
 def minegold(energy_num):#手動挖金
+    global lock
+    lock.acquire()
     Energy_buy(energy_num)
+    if int(driver.find_element_by_xpath('//*[@id="s_index"]').text)<200:
+        driver.find_element_by_xpath('//*[@id="header_my_fill_bar"]').click()
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
     wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]')
     driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]').click()#普通挖金
+    lock.release()
 def halfautowar(weapon_type,weapon_num):#半自動演習
+    global lock
+    lock.acquire()
     weapon_buy(weapon_type,weapon_num)
     wait('//*[@id="header_menu"]/div[16]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
@@ -216,7 +229,10 @@ def halfautowar(weapon_type,weapon_num):#半自動演習
     driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() # 軍事演習
     wait('//*[@id="send_b_wrap"]/div[4]')
     driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]').click() # 半自動
-def war(weapon_type,weapon_num):#手動演習
+    lock.release()
+def manualwar(weapon_type,weapon_num):#手動演習
+    global lock
+    lock.acquire()
     weapon_buy(weapon_type,weapon_num)
     wait('//*[@id="header_menu"]/div[16]')
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
@@ -224,17 +240,18 @@ def war(weapon_type,weapon_num):#手動演習
     driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() # 軍事演習
     wait('//*[@id="send_b_wrap"]/div[1]')
     driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[1]').click()#派兵
-def main():
-    login()
+    lock.acquire()
+def howtobuy_energy():
     while True:
         try:
             energy_num = int(input('沒能量飲料時購買數量(請大於600)：'))
             if energy_num>600:
-                break
+                return energy_num
             else:
                 print('錯誤!請重新輸入')
         except:
             print('錯誤!請重新輸入')
+def howtobuy_weapon():
     while True:
         try:
             weapon_type = int(input('請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：'))
@@ -250,18 +267,29 @@ def main():
             if weapon_num<600:
                 print('錯誤!請重新輸入')
             else:
-                break
+                return [weapon_type,weapon_num]
         except:
             print('錯誤!請重新輸入')
+def thread_create(arg1,arg2,arg3,mode):
+    goldfunc = [minegold,autominegold]
+    warfunc = [manualwar,halfautowar]
+    t1 = threading.Thread(target = autoperk,args = (arg1[0],arg1[1]))
+    t2 = threading.Thread(target = goldfunc[mode],args = (arg2,))
+    t3 = threading.Thread(target = warfunc[mode],args = (arg3[0],arg3[1]))
+    return [t1,t2,t3]
+def main():
+    global lock
+    lock=threading.Lock()
+    login()
+    mode = ispremium()
+    print('升級技能:')
+    perk = howtoperk()
+    print('挖金礦:')
+    energy_num = howtobuy_energy()
+    print('戰爭:')
+    war = howtobuy_weapon()
+    thread = thread_create(perk,energy_num,war,mode)
     
-    halfautowar(weapon_type,weapon_num)
-    '''
-    while True:
-    if iselemexit('//*[@id="header_my_fill_bar_countdown"]'):
-        minegold(energy_num)
-
-    '''
-        
 main()
 
 
