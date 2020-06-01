@@ -1,16 +1,16 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys #send_keys()
+from selenium.webdriver.common.by import By #定位元素
+#以下2個套件寫出wait函示
+from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import requests
-import getpass
+import getpass#隱藏輸入的密碼
 import math
-import threading
-driver = webdriver.Chrome()
-driver.maximize_window()
-driver.get('https://rivalregions.com/')
+import threading#多執行緒套件
+driver = webdriver.Chrome()#開啟CHROME
+driver.maximize_window()#最大化視窗
+driver.get('https://rivalregions.com/')#開啟RR
 def iselemexit(xpath):#檢測該元素是否存在 
     try:
         driver.find_element_by_xpath(xpath)
@@ -115,15 +115,15 @@ def login():#登入
             except:
                 pass
 def autoperk(type,isgold):#自動升技
-    global lock
-    lock.acquire()
+    global lock #lock = threading.Lock() 某執行緒執行時會鎖定執行權限，執行完後才會釋放
+    lock.acquire()#該function被呼叫時須執行完後才會執行下個function
     skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
     ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
     driver.get('https://rivalregions.com/')
     wait('//*[@id="index_perks_list"]/div[4]/div[1]')#等待str元素出現
     driver.find_element_by_xpath(skill[type-1]).click()
     driver.find_element_by_xpath(ornot_gold[isgold]).click()  
-    lock.release()
+    lock.release()#function讀取到release會讓下一個function執行
 def howtoperk():#是否用金升技以及升哪個技能
     while True:
         try:
@@ -241,7 +241,7 @@ def manualwar(weapon_type,weapon_num):#手動演習
     wait('//*[@id="send_b_wrap"]/div[1]')
     driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[1]').click()#派兵
     lock.acquire()
-def howtobuy_energy():
+def howtobuy_energy():#沒能量飲料時購買數量
     while True:
         try:
             energy_num = int(input('沒能量飲料時購買數量(請大於600)：'))
@@ -251,7 +251,7 @@ def howtobuy_energy():
                 print('錯誤!請重新輸入')
         except:
             print('錯誤!請重新輸入')
-def howtobuy_weapon():
+def howtobuy_weapon():#購買武器的種類及數量
     while True:
         try:
             weapon_type = int(input('請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：'))
@@ -270,7 +270,7 @@ def howtobuy_weapon():
                 return [weapon_type,weapon_num]
         except:
             print('錯誤!請重新輸入')
-def thread_create(arg1,arg2,arg3,mode):
+def thread_create(arg1,arg2,arg3,mode):#創建執行緒
     goldfunc = [minegold,autominegold]
     warfunc = [manualwar,halfautowar]
     t1 = threading.Thread(target = autoperk,args = (arg1[0],arg1[1]))
@@ -289,7 +289,7 @@ def main():
     print('戰爭:')
     war = howtobuy_weapon()
     thread = thread_create(perk,energy_num,war,mode)
-    
+
 main()
 
 
