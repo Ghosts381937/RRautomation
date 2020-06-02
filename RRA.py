@@ -23,9 +23,12 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
     except:
         return False
 def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完100秒
-    WebDriverWait(driver,100).until(
-        EC.presence_of_element_located((By.XPATH,xpath))
-    )
+    try:
+        WebDriverWait(driver,100).until(
+            EC.presence_of_element_located((By.XPATH,xpath))
+        )
+    except :
+        pass
     time.sleep(1)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
