@@ -223,6 +223,7 @@ def weapon_buy(weapon_type,weapon_num,driver):#買武器
 def autominegold(energy_num,driver):#自動挖金
     while True:
         Energy_buy(energy_num,driver)
+        wait('//*[@id="header_menu"]/div[9]',driver)
         driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()#生產
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]',driver)
         if driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').text == '自動模式':
