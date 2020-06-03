@@ -28,7 +28,7 @@ def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完100�
             EC.presence_of_element_located((By.XPATH,xpath))
         )
     except :
-        pass
+        driver.refresh()
     time.sleep(1)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
@@ -129,6 +129,10 @@ def autoperk(type,isgold,driver):#自動升技
         skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
         ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
         driver.get('https://rivalregions.com/')
+        if iselemexit('//*[@id="header_my_avatar"]',driver):
+            pass
+        else:
+            login(acc[0],acc[1],acc[2],driver)  
         wait(skill[type-1],driver)#等待該元素出現
         driver.find_element_by_xpath(skill[type-1]).click()
         time.sleep(1)
@@ -140,10 +144,12 @@ def autoperk(type,isgold,driver):#自動升技
                     pass
                 else:
                     login(acc[0],acc[1],acc[2],driver)  
+                wait(skill[type-1],driver)
                 driver.find_element_by_xpath(skill[type-1]).click()
                 time.sleep(1)
                 driver.find_element_by_xpath(ornot_gold[isgold]).click()
                 break
+            time.sleep(5)
             driver.refresh()
             wait(skill[type-1],driver)#等待該元素出現
             
