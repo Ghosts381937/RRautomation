@@ -178,10 +178,9 @@ def Energy_buy(energy_num,driver):#買能量飲料
         driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
     else:
         pass
-def weapon_buy(weapon_type,weapon_num,driver):#買武器
+def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
     global maxstation
     damage = [75,2000,6000]#3種武器分別的傷害
-    chainfo = getchainfo(driver)
     print(chainfo)
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
     print(maxstation)
@@ -241,8 +240,9 @@ def minegold(energy_num,driver):#手動挖金
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global maxstation
     wait('//*[@id="index_perks_list"]/div[1]/div[1]',driver)
+    chainfo = getchainfo(driver)
     while True:
-        weapon_buy(weapon_type,weapon_num,driver)
+        weapon_buy(weapon_type,weapon_num,chainfo,driver)
         wait('//*[@id="header_menu"]/div[16]',driver)
         driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
         wait('//*[@id="content"]/div[4]/div[2]/div',driver)
@@ -258,7 +258,8 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
             driver.find_element_by_xpath('//*[@id="slide_close"]').click()#關掉演習頁面
         time.sleep(1805)
 def manualwar(weapon_type,weapon_num,driver):#手動演習
-    weapon_buy(weapon_type,weapon_num,driver)
+    chainfo = getchainfo(driver)
+    weapon_buy(weapon_type,weapon_num,chainfo,driver)
     wait('//*[@id="header_menu"]/div[16]',driver)
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div',driver)
