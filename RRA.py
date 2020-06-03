@@ -22,13 +22,14 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
         return True
     except:
         return False
-def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完100秒
+def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完30秒後refresh
     try:
-        WebDriverWait(driver,100).until(
+        WebDriverWait(driver,30).until(
             EC.presence_of_element_located((By.XPATH,xpath))
         )
     except :
         driver.refresh()
+        wait(xpath,driver)
     time.sleep(1)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
@@ -125,35 +126,24 @@ def login(account,username,password,driver):#登入
                 pass
 def autoperk(type,isgold,driver):#自動升技
     global acc
+    driver.get('https://rivalregions.com/')
+    skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
+    ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
     while True:
-        skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
-        ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
-        driver.get('https://rivalregions.com/')
-        if iselemexit('//*[@id="header_my_avatar"]',driver):
-            pass
-        else:
-            login(acc[0],acc[1],acc[2],driver)  
-        wait(skill[type-1],driver)#等待該元素出現
-        driver.find_element_by_xpath(skill[type-1]).click()
-        time.sleep(1)
-        while True:
-            if iselemexit('//*[@id="perk_counter_2"]',driver):
-                pass
-            else:
-                if iselemexit('//*[@id="header_my_avatar"]',driver):
-                    pass
-                else:
-                    login(acc[0],acc[1],acc[2],driver)  
-                wait(skill[type-1],driver)
-                driver.find_element_by_xpath(skill[type-1]).click()
-                time.sleep(1)
-                driver.find_element_by_xpath(ornot_gold[isgold]).click()
-                break
+        wait(skill[type-1],driver) #等待該元素出現
+        if iselemexit('//*[@id="perk_counter_2"]',driver):
             time.sleep(5)
             driver.refresh()
-            wait(skill[type-1],driver)#等待該元素出現
-            
-        
+        else:
+            if iselemexit('//*[@id="header_my_avatar"]',driver):
+                pass
+            else:
+                login(acc[0],acc[1],acc[2],driver)
+                wait(skill[type-1],driver)  
+            driver.find_element_by_xpath(skill[type-1]).click()
+            time.sleep(1)
+            driver.find_element_by_xpath(ornot_gold[isgold]).click()
+            wait(skill[type-1],driver)
 def howtoperk():#是否用金升技以及升哪個技能
     while True:
         try:
