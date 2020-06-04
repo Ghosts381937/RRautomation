@@ -141,7 +141,12 @@ def autoperk(type,isgold,driver):#自動升技
             else:
                 login(acc[0],acc[1],acc[2],driver)
                 wait(skill[type-1],driver)  
-            driver.find_element_by_xpath(skill[type-1]).click()#點擊該技能
+            while True:
+                try:
+                    driver.find_element_by_xpath(skill[type-1]).click()#點擊該技能
+                    break
+                except:
+                    pass
             time.sleep(1)
             driver.find_element_by_xpath(ornot_gold[isgold]).click()#點擊升級
             wait(skill[type-1],driver)
@@ -184,6 +189,8 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
     print(chainfo)
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
     print(maxstation)
+    driver.get('https://rivalregions.com/')
+    wait('//*[@id="header_menu"]/div[6]',driver)
     driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click() # 倉庫
     if weapon_type == 1:
         wait('//*[@id="content"]/div[15]/div[3]/span',driver)
@@ -254,8 +261,6 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
             inputbox.clear()
             inputbox.send_keys(maxstation)
             driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]').click() # 半自動
-            time.sleep(3)
-            driver.find_element_by_xpath('//*[@id="slide_close"]').click()#關掉演習頁面
         time.sleep(1805)
 def manualwar(weapon_type,weapon_num,driver):#手動演習
     chainfo = getchainfo(driver)
