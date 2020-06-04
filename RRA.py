@@ -22,6 +22,13 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
         return True
     except:
         return False
+def click(elem):
+    while True:
+        try:
+            elem.click()
+            break
+        except:
+            pass
 def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完30秒後refresh
     try:
         WebDriverWait(driver,30).until(
@@ -30,11 +37,11 @@ def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完30秒
     except :
         driver.refresh()
         wait(xpath,driver)
-    time.sleep(1)
+    time.sleep(2)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
     wait('//*[@id="header_money"]/div',driver)
-    driver.find_element_by_xpath('//*[@id="header_money"]/div').click()#點擊右上角課金選項
+    click(driver.find_element_by_xpath('//*[@id="header_money"]/div'))#點擊右上角課金選項
     #獲取是否為高級會員字串
     wait('//*[@id="header_slide_inner"]/div[3]/form[3]/div[3]/div/h1',driver)
     member = driver.find_element_by_xpath('//*[@id="header_slide_inner"]/div[3]/form[3]/div[3]/div/h1').text
@@ -76,7 +83,7 @@ def howtologin():
     return [account,username,password]
 def login(account,username,password,driver):#登入
     if account == 1:
-        driver.find_element_by_tag_name('div.sa_sn.imp.float_left').click()#點選fb登入
+        click(driver.find_element_by_tag_name('div.sa_sn.imp.float_left'))#點選fb登入
         while True:
             try:
                 wait('//*[@id="email"]',driver)
@@ -90,7 +97,7 @@ def login(account,username,password,driver):#登入
                 print('錯誤!重新登入中')
     #google
     elif account == 2:
-        driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo').click()
+        click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
         while True:
             try:
                 wait('//*[@id="identifierId"]',driver)
@@ -111,7 +118,7 @@ def login(account,username,password,driver):#登入
                 print('錯誤!重新登入中')   
     #vk
     else:
-        driver.find_element_by_xpath('//*[@id="sa_add2"]/div[2]/a[3]/div').click()
+        click(driver.find_element_by_xpath('//*[@id="sa_add2"]/div[2]/a[3]/div'))
         while True:
             try:
                 wait('//*[@id="login_submit"]/div/div/input[6]',driver)
@@ -141,14 +148,9 @@ def autoperk(type,isgold,driver):#自動升技
             else:
                 login(acc[0],acc[1],acc[2],driver)
                 wait(skill[type-1],driver)  
-            while True:
-                try:
-                    driver.find_element_by_xpath(skill[type-1]).click()#點擊該技能
-                    break
-                except:
-                    pass
+            click(driver.find_element_by_xpath(skill[type-1]))#點擊該技能
             time.sleep(1)
-            driver.find_element_by_xpath(ornot_gold[isgold]).click()#點擊升級
+            click(driver.find_element_by_xpath(ornot_gold[isgold]))#點擊升級
             wait(skill[type-1],driver)
 def howtoperk():#是否用金升技以及升哪個技能
     while True:
@@ -171,16 +173,16 @@ def howtoperk():#是否用金升技以及升哪個技能
             print('錯誤輸入')
     return [typ,isgold]
 def Energy_buy(energy_num,driver):#買能量飲料
-    driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click()# 倉庫
+    click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]'))# 倉庫
     wait('//*[@id="content"]/div[11]/div[3]/span',driver)
     Enegy = int(driver.find_element_by_xpath('//*[@id="content"]/div[11]/div[3]/span').text.replace('.',''))# 能量飲料目前數量
     if Enegy <= 600: 
-        driver.find_element_by_xpath('//*[@id="content"]/div[11]').click()# 點擊飲料打開購買欄
+        click(driver.find_element_by_xpath('//*[@id="content"]/div[11]'))# 點擊飲料打開購買欄
         wait('//*[@id="storage_market"]/div[2]/div[3]/input',driver)
         num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[3]/input')#抓購買數量框
         num.clear()
         num.send_keys(energy_num)
-        driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div').click()# 輸入並購買   
+        click(driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div'))# 輸入並購買   
     else:
         pass
 def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
@@ -189,15 +191,14 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
     print(chainfo)
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
     print(maxstation)
-    driver.get('https://rivalregions.com/')
     wait('//*[@id="header_menu"]/div[6]',driver)
-    driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]').click() # 倉庫
+    click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]')) # 倉庫
     if weapon_type == 1:
         wait('//*[@id="content"]/div[15]/div[3]/span',driver)
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[15]/div[3]/span').text.replace('.','')) # 戰機數量
         if weapon_now <= maxstation:
             wait('//*[@id="content"]/div[15]',driver)
-            driver.find_element_by_xpath('//*[@id="content"]/div[15]').click() # 點擊戰機打開購買欄
+            click(driver.find_element_by_xpath('//*[@id="content"]/div[15]')) # 點擊戰機打開購買欄
             wait('//*[@id="storage_market"]/div[2]/div[1]/div[5]/input',driver)
             # 輸入並購買
             num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[5]/input')
@@ -209,7 +210,7 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[20]/div[3]/span').text.replace('.','')) # 月球戰車數量
         if weapon_now <= maxstation:
             wait('//*[@id="content"]/div[20]',driver)
-            driver.find_element_by_xpath('//*[@id="content"]/div[20]').click() # 點擊月球戰車打開購買欄
+            click(driver.find_element_by_xpath('//*[@id="content"]/div[20]')) # 點擊月球戰車打開購買欄
             wait('//*[@id="storage_market"]/div[2]/div[1]/div[5]/input',driver)
             # 輸入並購買
             num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[5]/input')
@@ -221,29 +222,29 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[19]/div[3]/span').text.replace('.','')) # 無人機數量
         if weapon_now <= maxstation:
             wait('//*[@id="content"]/div[19]',driver)
-            driver.find_element_by_xpath('//*[@id="content"]/div[19]').click() # 點擊無人機打開購買欄
+            click(driver.find_element_by_xpath('//*[@id="content"]/div[19]')) # 點擊無人機打開購買欄
             wait('//*[@id="storage_market"]/div[2]/div[1]/div[5]/input',driver)
             # 輸入並購買
             num = driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[5]/input')
             num.clear()
             num.send_keys(weapon_num)
-            driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]').click()
+            click(driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]'))
 def autominegold(energy_num,driver):#自動挖金
     while True:
         Energy_buy(energy_num,driver)
         wait('//*[@id="header_menu"]/div[9]',driver)
-        driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()#生產
+        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))#生產
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]',driver)
         if driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').text == '自動模式':
-            driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').click()#自動模式
+            click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]'))#自動模式
         time.sleep(605)
 def minegold(energy_num,driver):#手動挖金
     Energy_buy(energy_num,driver)
     if int(driver.find_element_by_xpath('//*[@id="s_index"]').text)<200:
-        driver.find_element_by_xpath('//*[@id="header_my_fill_bar"]').click()
-    driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]').click()# 生產
+        click(driver.find_element_by_xpath('//*[@id="header_my_fill_bar"]'))
+    click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))# 生產
     wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]',driver)
-    driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]').click()#普通挖金
+    click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global maxstation
     wait('//*[@id="index_perks_list"]/div[1]/div[1]',driver)
@@ -251,26 +252,26 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     while True:
         weapon_buy(weapon_type,weapon_num,chainfo,driver)
         wait('//*[@id="header_menu"]/div[16]',driver)
-        driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
+        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
         wait('//*[@id="content"]/div[4]/div[2]/div',driver)
-        time.sleep(1)
-        driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() #軍事演習
-        time.sleep(3)
+        click(driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div')) #軍事演習
+        wait('//*[@id="send_b_wrap"]/div[4]',driver)
         if iselemexit('//*[@id="send_b_wrap"]/div[4]',driver):
             inputbox = driver.find_element_by_xpath('//*[@id="header_slide_inner"]/div[4]/div[2]/div[3]/input')
             inputbox.clear()
             inputbox.send_keys(maxstation)
-            driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]').click() # 半自動
+            click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]')) # 半自動
+        driver.get('https://rivalregions.com/')
         time.sleep(1805)
 def manualwar(weapon_type,weapon_num,driver):#手動演習
     chainfo = getchainfo(driver)
     weapon_buy(weapon_type,weapon_num,chainfo,driver)
     wait('//*[@id="header_menu"]/div[16]',driver)
-    driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]').click() # 戰爭
+    click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div',driver)
-    driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div').click() # 軍事演習
+    click(driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div')) # 軍事演習
     wait('//*[@id="send_b_wrap"]/div[1]',driver)
-    driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[1]').click()#派兵
+    click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[1]'))#派兵
 def howtobuy_energy():#沒能量飲料時購買數量
     while True:
         try:
