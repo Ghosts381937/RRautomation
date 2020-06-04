@@ -251,12 +251,15 @@ def autominegold(energy_num,driver):#自動挖金
             click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]'))#自動模式
         time.sleep(605)
 def minegold(energy_num,driver):#手動挖金
-    Energy_buy(energy_num,driver)
-    if int(driver.find_element_by_xpath('//*[@id="s_index"]').text)<200:
-        click(driver.find_element_by_xpath('//*[@id="header_my_fill_bar"]'))
-    click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))# 生產
-    wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]',driver)
-    click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
+    while True:
+        Energy_buy(energy_num,driver)
+        driver.get(('https://rivalregions.com/'))
+        wait('//*[@id="s_index"]',driver)
+        if int(driver.find_element_by_xpath('//*[@id="s_index"]').text)<200 and iselemexit('//*[@id="header_my_fill_bar"]',driver):
+            click(driver.find_element_by_xpath('//*[@id="header_my_fill_bar"]'))
+        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))# 生產
+        wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]',driver)
+        click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global maxstation
     wait('//*[@id="index_perks_list"]/div[1]/div[1]',driver)
