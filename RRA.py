@@ -163,7 +163,6 @@ def autoperk(type,isgold,driver):#自動升技
             click(driver.find_element_by_xpath(skill[type-1]))#點擊該技能
             time.sleep(1)
             click(driver.find_element_by_xpath(ornot_gold[isgold]))#點擊升級
-            wait(skill[type-1],driver)
 def howtoperk():#是否用金升技以及升哪個技能
     while True:
         try:
@@ -186,6 +185,12 @@ def howtoperk():#是否用金升技以及升哪個技能
     return [typ,isgold]
 def Energy_buy(energy_num,driver):#買能量飲料
     click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]'))# 倉庫
+    if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
+        pass
+    else:
+        login(acc[0],acc[1],acc[2],driver)
+        wait('//*[@id="header_menu"]/div[6]',driver)
+        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]'))
     wait('//*[@id="content"]/div[11]/div[3]/span',driver)
     Enegy = int(driver.find_element_by_xpath('//*[@id="content"]/div[11]/div[3]/span').text.replace('.',''))# 能量飲料目前數量
     if Enegy <= 600: 
@@ -205,6 +210,12 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
     print(maxstation)
     wait('//*[@id="header_menu"]/div[6]',driver)
     click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]')) # 倉庫
+    if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
+        pass
+    else:
+        login(acc[0],acc[1],acc[2],driver)
+        wait('//*[@id="header_menu"]/div[6]',driver)
+        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]'))
     if weapon_type == 1:
         wait('//*[@id="content"]/div[15]/div[3]/span',driver)
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[15]/div[3]/span').text.replace('.','')) # 戰機數量
@@ -262,7 +273,6 @@ def minegold(energy_num,driver):#手動挖金
         click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global maxstation
-    wait('//*[@id="index_perks_list"]/div[1]/div[1]',driver)
     chainfo = getchainfo(driver)
     while True:
         weapon_buy(weapon_type,weapon_num,chainfo,driver)
