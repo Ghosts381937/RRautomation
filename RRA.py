@@ -8,14 +8,26 @@ import time
 import getpass#隱藏輸入的密碼
 import math
 import threading#多執行緒套件
+from queue import Queue #處理執行緒回傳值
 #開啟CHROME
-driver_perk = webdriver.Chrome()
-driver_gold = webdriver.Chrome()
-driver_war = webdriver.Chrome()
+def driver_create(q):
+    driver = webdriver.Chrome()
+    driver.maximize_window()#最大化視窗
+    driver.get('https://rivalregions.com/')#開啟RR
+    q.put(driver)
+    
+t_tmp = list()
+q = Queue()
+for i in range(3):
+    t0 = threading.Thread(target=driver_create,args=(q,))
+    t0.start()
+    t_tmp.append(t0)
+for thread in t_tmp:
+    thread.join()
+driver_perk = q.get()
+driver_gold = q.get()
+driver_war = q.get()
 driver = [driver_perk,driver_gold,driver_war]
-for i in driver:
-    i.maximize_window()#最大化視窗
-    i.get('https://rivalregions.com/')#開啟RR
 def iselemexit(xpath,driver):#檢測該元素是否存在 
     try:
         driver.find_element_by_xpath(xpath)
@@ -255,7 +267,7 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
         wait('//*[@id="content"]/div[4]/div[2]/div',driver)
         click(driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div')) #軍事演習
-        wait('//*[@id="send_b_wrap"]/div[4]',driver)
+        wait('//*[@id="header_slide_inner"]/div[2]/h1/div[2]',driver)
         if iselemexit('//*[@id="send_b_wrap"]/div[4]',driver):
             inputbox = driver.find_element_by_xpath('//*[@id="header_slide_inner"]/div[4]/div[2]/div[3]/input')
             inputbox.clear()
@@ -311,8 +323,12 @@ def thread_create(arg1,arg2,arg3,mode):#創建執行緒
 def main():
     global acc #存登入資訊
     acc = howtologin()
+    t_tmp = list()
     for i in driver:
-        login(acc[0],acc[1],acc[2],i)
+        t = threading.Thread(target=login,args=(acc[0],acc[1],acc[2],i))
+        t.start()
+    for thread in t_tmp:
+        thread.join()
     mode = ispremium(driver_perk)
     print('升級技能:')
     perk = howtoperk()
