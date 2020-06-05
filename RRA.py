@@ -37,27 +37,24 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
 def click(elem):
     Count=0
     while True:
-        if Count>3:
+        if Count>5:
             break
         try:
             elem.click()
             break
         except:
             Count=Count+1
+            time.sleep(1)
             pass
 def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒後refresh
-    Count = 0
     while True:
-        if Count>3:
-            break
         try:
             WebDriverWait(driver,10).until(
                 EC.presence_of_element_located((By.XPATH,xpath))
             )
             break
         except :
-            driver.refresh()
-            Count = Count + 1
+            pass
     time.sleep(2)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
