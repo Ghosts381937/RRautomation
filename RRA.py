@@ -5,10 +5,10 @@ from selenium.webdriver.common.by import By #定位元素
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import getpass#隱藏輸入的密碼
 import math
 import threading#多執行緒套件
 from queue import Queue #處理執行緒回傳值
+from retrying import retry
 #開啟CHROME
 def driver_create(q):
     driver = webdriver.Chrome()
@@ -35,26 +35,29 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
     except:
         return False
 def click(elem):
-    Count=0
+    count=0
     while True:
-        if Count>5:
+        if count>5:
             break
         try:
             elem.click()
             break
         except:
-            Count=Count+1
+            count=count+1
             time.sleep(1)
-            pass
 def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒後refresh
+    count = 0
     while True:
+        if count>5:
+            break
         try:
             WebDriverWait(driver,10).until(
                 EC.presence_of_element_located((By.XPATH,xpath))
             )
             break
         except :
-            pass
+            count = count + 1
+            driver.refresh()
     time.sleep(2)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
@@ -97,7 +100,7 @@ def howtologin():
         except:
             print('錯誤輸入')
     username = input('請輸入帳號:')
-    password = getpass.getpass('請輸入密碼:')
+    password = input('請輸入密碼:')
     return [account,username,password]
 def login(account,username,password,driver):#登入
     if account == 1:
@@ -157,7 +160,7 @@ def autoperk(type,isgold,driver):#自動升技
         wait(skill[type-1],driver) #等待所選技能欄位出現
         #若頁面上有倒數計時(目前在升級中)
         if iselemexit('//*[@id="perk_counter_2"]',driver):
-            time.sleep(8)
+            time.sleep(10)
             driver.refresh()#頁面重整
         else:
             #確保帳號有在登入狀態
@@ -213,9 +216,6 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
     damage = [75,2000,6000]#3種武器分別的傷害
     print(chainfo)
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
-    print(maxstation)
-    wait('//*[@id="header_menu"]/div[6]',driver)
-    click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]')) # 倉庫
     if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
         pass
     else:
@@ -258,6 +258,7 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
             num.clear()
             num.send_keys(weapon_num)
             click(driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]'))
+@retry
 def autominegold(energy_num,driver):#自動挖金
     while True:
         Energy_buy(energy_num,driver)
@@ -266,7 +267,7 @@ def autominegold(energy_num,driver):#自動挖金
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]',driver)
         if driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').text == '自動模式':
             click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]'))#自動模式
-        time.sleep(20)
+        time.sleep(30)
 def minegold(energy_num,driver):#手動挖金
     while True:
         Energy_buy(energy_num,driver)
@@ -277,10 +278,13 @@ def minegold(energy_num,driver):#手動挖金
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))# 生產
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]',driver)
         click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
+@retry
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global maxstation
     chainfo = getchainfo(driver)
     while True:
+        driver.get('https://rivalregions.com/#storage')
+        driver.refresh()
         weapon_buy(weapon_type,weapon_num,chainfo,driver)
         wait('//*[@id="header_menu"]/div[16]',driver)
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
@@ -292,8 +296,7 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
             inputbox.clear()
             inputbox.send_keys(maxstation)
             click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]')) # 半自動
-        driver.get('https://rivalregions.com/')
-        time.sleep(20)
+        time.sleep(30)
 def manualwar(weapon_type,weapon_num,driver):#手動演習
     chainfo = getchainfo(driver)
     weapon_buy(weapon_type,weapon_num,chainfo,driver)
@@ -360,10 +363,3 @@ def main():
     thread[1].start()
     thread[2].start()
 main()
-
-
-
-
-   
-
-
