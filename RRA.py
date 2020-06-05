@@ -37,22 +37,27 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
 def click(elem):
     Count=0
     while True:
-        if Count>5:
+        if Count>3:
             break
         try:
             elem.click()
             break
         except:
-            pass
             Count=Count+1
-def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完30秒後refresh
-    try:
-        WebDriverWait(driver,10).until(
-            EC.presence_of_element_located((By.XPATH,xpath))
-        )
-    except :
-        driver.refresh()
-        wait(xpath,driver)
+            pass
+def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒後refresh
+    Count = 0
+    while True:
+        if Count>3:
+            break
+        try:
+            WebDriverWait(driver,10).until(
+                EC.presence_of_element_located((By.XPATH,xpath))
+            )
+            break
+        except :
+            driver.refresh()
+            Count = Count + 1
     time.sleep(2)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
@@ -155,7 +160,7 @@ def autoperk(type,isgold,driver):#自動升技
         wait(skill[type-1],driver) #等待所選技能欄位出現
         #若頁面上有倒數計時(目前在升級中)
         if iselemexit('//*[@id="perk_counter_2"]',driver):
-            time.sleep(5)
+            time.sleep(8)
             driver.refresh()#頁面重整
         else:
             #確保帳號有在登入狀態
