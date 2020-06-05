@@ -37,14 +37,14 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
 def click(elem):
     Count=0
     while True:
-        if Counter>5:
+        if Count>5:
             break
         try:
             elem.click()
             break
         except:
             pass
-            Counter=Counter+1
+            Count=Count+1
 def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完30秒後refresh
     try:
         WebDriverWait(driver,10).until(
