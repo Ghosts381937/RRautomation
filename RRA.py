@@ -260,7 +260,7 @@ def autominegold(energy_num,driver):#自動挖金
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]',driver)
         if driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').text == '自動模式':
             click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]'))#自動模式
-        time.sleep(605)
+        time.sleep(20)
 def minegold(energy_num,driver):#手動挖金
     while True:
         Energy_buy(energy_num,driver)
@@ -287,7 +287,7 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
             inputbox.send_keys(maxstation)
             click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]')) # 半自動
         driver.get('https://rivalregions.com/')
-        time.sleep(1805)
+        time.sleep(20)
 def manualwar(weapon_type,weapon_num,driver):#手動演習
     chainfo = getchainfo(driver)
     weapon_buy(weapon_type,weapon_num,chainfo,driver)
