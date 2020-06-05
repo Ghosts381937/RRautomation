@@ -103,9 +103,12 @@ def howtologin():
     password = input('請輸入密碼:')
     return [account,username,password]
 def login(account,username,password,driver):#登入
+    count = 0
     if account == 1:
         click(driver.find_element_by_tag_name('div.sa_sn.imp.float_left'))#點選fb登入
         while True:
+            if count > 5:
+                break
             try:
                 wait('//*[@id="email"]',driver)
                 email = driver.find_element_by_xpath('//*[@id="email"]')#取得輸入email框位置
@@ -116,10 +119,13 @@ def login(account,username,password,driver):#登入
                 break
             except:
                 print('錯誤!重新登入中')
+                count = count + 1
     #google
     elif account == 2:
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
         while True:
+            if count > 10:
+                break
             try:
                 wait('//*[@id="identifierId"]',driver)
                 email = driver.find_element_by_xpath('//*[@id="identifierId"]')
@@ -128,7 +134,10 @@ def login(account,username,password,driver):#登入
                 break
             except:
                 print('錯誤!重新登入中')
+                count = count + 1
         while True:
+            if count > 10:
+                break
             try:
                 wait('//*[@id="password"]/div[1]/div/div[1]/input',driver)#等待下個頁面跳出
                 pas = driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
@@ -136,11 +145,14 @@ def login(account,username,password,driver):#登入
                 pas.send_keys(Keys.ENTER)
                 break
             except:
-                print('錯誤!重新登入中')   
+                print('錯誤!重新登入中')  
+                count = count + 1
     #vk
     else:
         click(driver.find_element_by_xpath('//*[@id="sa_add2"]/div[2]/a[3]/div'))
         while True:
+            if count > 5:
+                break 
             try:
                 wait('//*[@id="login_submit"]/div/div/input[6]',driver)
                 email = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[6]')
@@ -150,7 +162,8 @@ def login(account,username,password,driver):#登入
                 pas.submit()
                 break
             except:
-                pass
+                print('錯誤!重新登入中')
+                count = count + 1  
 def autoperk(type,isgold,driver):#自動升技
     global acc
     driver.get('https://rivalregions.com/')
