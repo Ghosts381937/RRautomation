@@ -37,7 +37,7 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
 def click(elem):
     Count=0
     while True:
-        if Counter>5:
+        if Count>5:
             break
         try:
             elem.click()
