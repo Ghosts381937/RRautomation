@@ -9,6 +9,8 @@ import math
 import threading#多執行緒套件
 from queue import Queue #處理執行緒回傳值
 from retrying import retry
+global switch
+switch = 1
 #開啟CHROME
 def driver_create(q):
     driver = webdriver.Chrome()
@@ -350,8 +352,7 @@ def thread_create(arg1,arg2,arg3,mode):#創建執行緒
     return [t1,t2,t3,t4]
 def thread_kill():
     global switch
-    switch = 1
-    while(switch):
+    while switch:
         try:
             switch = int(input('輸入0關閉程式:'))
             if switch == 0:
@@ -389,6 +390,8 @@ def main():
             thread[1].join()
             thread[2].join()
             thread[3].join()
+            for browser in driver:
+                browser.close()
             print('成功關閉程式.....')
             break
         else:
