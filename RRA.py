@@ -12,10 +12,9 @@ from retrying import retry
 #開啟CHROME
 def driver_create(q):
     driver = webdriver.Chrome()
-    driver.maximize_window()#最大化視窗
+    driver.maximize_window()
     driver.get('https://rivalregions.com/')#開啟RR
     q.put(driver)
-    
 t_tmp = list()
 q = Queue()
 for i in range(3):
@@ -27,6 +26,7 @@ for thread in t_tmp:
 driver_perk = q.get()
 driver_gold = q.get()
 driver_war = q.get()
+print('成功開啟瀏覽器')
 driver = [driver_perk,driver_gold,driver_war]
 def iselemexit(xpath,driver):#檢測該元素是否存在 
     try:
@@ -55,7 +55,7 @@ def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒
                 EC.presence_of_element_located((By.XPATH,xpath))
             )
             break
-        except :
+        except:
             count = count + 1
             driver.refresh()
     time.sleep(2)
@@ -103,12 +103,9 @@ def howtologin():
     password = input('請輸入密碼:')
     return [account,username,password]
 def login(account,username,password,driver):#登入
-    count = 0
     if account == 1:
         click(driver.find_element_by_tag_name('div.sa_sn.imp.float_left'))#點選fb登入
         while True:
-            if count > 5:
-                break
             try:
                 wait('//*[@id="email"]',driver)
                 email = driver.find_element_by_xpath('//*[@id="email"]')#取得輸入email框位置
@@ -119,13 +116,10 @@ def login(account,username,password,driver):#登入
                 break
             except:
                 print('錯誤!重新登入中')
-                count = count + 1
     #google
     elif account == 2:
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
         while True:
-            if count > 10:
-                break
             try:
                 wait('//*[@id="identifierId"]',driver)
                 email = driver.find_element_by_xpath('//*[@id="identifierId"]')
@@ -134,10 +128,7 @@ def login(account,username,password,driver):#登入
                 break
             except:
                 print('錯誤!重新登入中')
-                count = count + 1
         while True:
-            if count > 10:
-                break
             try:
                 wait('//*[@id="password"]/div[1]/div/div[1]/input',driver)#等待下個頁面跳出
                 pas = driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
@@ -146,13 +137,10 @@ def login(account,username,password,driver):#登入
                 break
             except:
                 print('錯誤!重新登入中')  
-                count = count + 1
     #vk
     else:
         click(driver.find_element_by_xpath('//*[@id="sa_add2"]/div[2]/a[3]/div'))
         while True:
-            if count > 5:
-                break 
             try:
                 wait('//*[@id="login_submit"]/div/div/input[6]',driver)
                 email = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[6]')
@@ -163,7 +151,13 @@ def login(account,username,password,driver):#登入
                 break
             except:
                 print('錯誤!重新登入中')
-                count = count + 1  
+def relogin(acc_type,driver):
+    if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
+        return False
+    else:
+        driver.refresh()
+        wait('div.sa_sn.float_left.imp.gogo',driver)
+        click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
 def autoperk(type,isgold,driver):#自動升技
     global acc
     driver.get('https://rivalregions.com/')
@@ -176,12 +170,7 @@ def autoperk(type,isgold,driver):#自動升技
             time.sleep(10)
             driver.refresh()#頁面重整
         else:
-            #確保帳號有在登入狀態
-            if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
-                pass
-            else:
-                login(acc[0],acc[1],acc[2],driver)
-                wait(skill[type-1],driver)  
+            relogin(acc[0],driver)
             click(driver.find_element_by_xpath(skill[type-1]))#點擊該技能
             time.sleep(1)
             click(driver.find_element_by_xpath(ornot_gold[isgold]))#點擊升級
@@ -206,13 +195,10 @@ def howtoperk():#是否用金升技以及升哪個技能
             print('錯誤輸入')
     return [typ,isgold]
 def Energy_buy(energy_num,driver):#買能量飲料
+    global acc
+    relogin(acc[0],driver)
+    wait('//*[@id="header_menu"]/div[6]',driver)
     click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]'))# 倉庫
-    if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
-        pass
-    else:
-        login(acc[0],acc[1],acc[2],driver)
-        wait('//*[@id="header_menu"]/div[6]',driver)
-        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]'))
     wait('//*[@id="content"]/div[11]/div[3]/span',driver)
     Enegy = int(driver.find_element_by_xpath('//*[@id="content"]/div[11]/div[3]/span').text.replace('.',''))# 能量飲料目前數量
     if Enegy <= 600: 
@@ -227,14 +213,10 @@ def Energy_buy(energy_num,driver):#買能量飲料
 def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
     global maxstation
     damage = [75,2000,6000]#3種武器分別的傷害
-    print(chainfo)
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
-    if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
-        pass
-    else:
-        login(acc[0],acc[1],acc[2],driver)
-        wait('//*[@id="header_menu"]/div[6]',driver)
-        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[6]'))
+    relogin(acc[0],driver)
+    driver.get('https://rivalregions.com/#storage')
+    driver.refresh()
     if weapon_type == 1:
         wait('//*[@id="content"]/div[15]/div[3]/span',driver)
         weapon_now = int(driver.find_element_by_xpath('//*[@id="content"]/div[15]/div[3]/span').text.replace('.','')) # 戰機數量
@@ -296,8 +278,6 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global maxstation
     chainfo = getchainfo(driver)
     while True:
-        driver.get('https://rivalregions.com/#storage')
-        driver.refresh()
         weapon_buy(weapon_type,weapon_num,chainfo,driver)
         wait('//*[@id="header_menu"]/div[16]',driver)
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
@@ -362,6 +342,7 @@ def main():
     for i in driver:
         t = threading.Thread(target=login,args=(acc[0],acc[1],acc[2],i))
         t.start()
+        t_tmp.append(t)
     for thread in t_tmp:
         thread.join()
     mode = ispremium(driver_perk)
