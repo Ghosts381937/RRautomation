@@ -35,8 +35,9 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
     except:
         return False
 def click(elem):
+    global switch
     count=0
-    while True:
+    while switch:
         if count>5:
             break
         try:
@@ -46,8 +47,9 @@ def click(elem):
             count=count+1
             time.sleep(1)
 def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒後refresh
+    global switch
     count = 0
-    while True:
+    while switch:
         if count>5:
             break
         try:
@@ -88,7 +90,8 @@ def single_costenergy(end):#單次派兵消耗能量
     else:
         return 6
 def howtologin():
-    while True:
+    global switch
+    while switch:
         try:
             account = int(input('請輸入帳號類型(1.FB 2.Google 3.VK):'))
             #避免輸入123以外的數字
@@ -103,9 +106,10 @@ def howtologin():
     password = input('請輸入密碼:')
     return [account,username,password]
 def login(account,username,password,driver):#登入
+    global switch
     if account == 1:
         click(driver.find_element_by_tag_name('div.sa_sn.imp.float_left'))#點選fb登入
-        while True:
+        while switch:
             try:
                 wait('//*[@id="email"]',driver)
                 email = driver.find_element_by_xpath('//*[@id="email"]')#取得輸入email框位置
@@ -119,7 +123,7 @@ def login(account,username,password,driver):#登入
     #google
     elif account == 2:
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
-        while True:
+        while switch:
             try:
                 wait('//*[@id="identifierId"]',driver)
                 email = driver.find_element_by_xpath('//*[@id="identifierId"]')
@@ -128,7 +132,7 @@ def login(account,username,password,driver):#登入
                 break
             except:
                 print('錯誤!重新登入中')
-        while True:
+        while switch:
             try:
                 wait('//*[@id="password"]/div[1]/div/div[1]/input',driver)#等待下個頁面跳出
                 pas = driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
@@ -140,7 +144,7 @@ def login(account,username,password,driver):#登入
     #vk
     else:
         click(driver.find_element_by_xpath('//*[@id="sa_add2"]/div[2]/a[3]/div'))
-        while True:
+        while switch:
             try:
                 wait('//*[@id="login_submit"]/div/div/input[6]',driver)
                 email = driver.find_element_by_xpath('//*[@id="login_submit"]/div/div/input[6]')
@@ -160,11 +164,12 @@ def relogin(acc_type,driver):
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
 @retry
 def autoperk(type,isgold,driver):#自動升技
+    global switch
     global acc
     driver.get('https://rivalregions.com/')
     skill = ['//*[@id="index_perks_list"]/div[4]/div[1]','//*[@id="index_perks_list"]/div[5]/div[1]','//*[@id="index_perks_list"]/div[6]/div[1]']#技能元素位置
     ornot_gold = ['//*[@id="perk_target_4"]/div[1]/div[1]/div','//*[@id="perk_target_4"]/div[2]/div[1]/div']#是否用金升技能個別位置
-    while True:
+    while switch:
         wait(skill[type-1],driver) #等待所選技能欄位出現
         #若頁面上有倒數計時(目前在升級中)
         if iselemexit('//*[@id="perk_counter_2"]',driver):
@@ -176,7 +181,8 @@ def autoperk(type,isgold,driver):#自動升技
             time.sleep(1)
             click(driver.find_element_by_xpath(ornot_gold[isgold]))#點擊升級
 def howtoperk():#是否用金升技以及升哪個技能
-    while True:
+    global switch
+    while switch:
         try:
             typ = int(input('請輸入欲升級的技能(1.STR 2.EDU 3.END):'))
             if typ!=1 and typ!=2 and typ!=3:
@@ -185,7 +191,7 @@ def howtoperk():#是否用金升技以及升哪個技能
                 break
         except:
             print('錯誤輸入')
-    while True:
+    while switch:
         try:
             isgold = int(input('是否使用黃金升級技能(0.NO 1.YES):'))
             if isgold!=0 and isgold!=1:
@@ -256,7 +262,8 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
             click(driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]'))
 @retry
 def autominegold(energy_num,driver):#自動挖金
-    while True:
+    global switch
+    while switch:
         Energy_buy(energy_num,driver)
         wait('//*[@id="header_menu"]/div[9]',driver)
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))#生產
@@ -265,7 +272,8 @@ def autominegold(energy_num,driver):#自動挖金
             click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]'))#自動模式
         time.sleep(30)
 def minegold(energy_num,driver):#手動挖金
-    while True:
+    global switch
+    while switch:
         Energy_buy(energy_num,driver)
         driver.get(('https://rivalregions.com/'))
         wait('//*[@id="s_index"]',driver)
@@ -276,9 +284,10 @@ def minegold(energy_num,driver):#手動挖金
         click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
 @retry
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
+    global switch
     global maxstation
     chainfo = getchainfo(driver)
-    while True:
+    while switch:
         weapon_buy(weapon_type,weapon_num,chainfo,driver)
         wait('//*[@id="header_menu"]/div[16]',driver)
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
@@ -301,7 +310,8 @@ def manualwar(weapon_type,weapon_num,driver):#手動演習
     wait('//*[@id="send_b_wrap"]/div[1]',driver)
     click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[1]'))#派兵
 def howtobuy_energy():#沒能量飲料時購買數量
-    while True:
+    global switch
+    while switch:
         try:
             energy_num = int(input('沒能量飲料時購買數量(請大於600)：'))
             if energy_num>600:
@@ -311,7 +321,8 @@ def howtobuy_energy():#沒能量飲料時購買數量
         except:
             print('錯誤!請重新輸入')
 def howtobuy_weapon():#購買武器的種類及數量
-    while True:
+    global switch
+    while switch:
         try:
             weapon_type = int(input('請選擇要買哪種武器1.戰機2.月球戰車3.激光無人機：'))
             if weapon_type!=1 and weapon_type!=2 and weapon_type!=3:
@@ -320,7 +331,7 @@ def howtobuy_weapon():#購買武器的種類及數量
                 break
         except:
             print('錯誤!請重新輸入')
-    while True:
+    while switch:
         try:
             weapon_num = int(input('購買數量：'))
             if weapon_num<600:
@@ -335,9 +346,23 @@ def thread_create(arg1,arg2,arg3,mode):#創建執行緒
     t1 = threading.Thread(target = autoperk,args = (arg1[0],arg1[1],driver_perk))
     t2 = threading.Thread(target = goldfunc[mode],args = (arg2,driver_gold))
     t3 = threading.Thread(target = warfunc[mode],args = (arg3[0],arg3[1],driver_war))
-    return [t1,t2,t3]
+    t4 = threading.Thread(target = thread_kill)
+    return [t1,t2,t3,t4]
+def thread_kill():
+    global switch
+    switch = 1
+    while(switch):
+        try:
+            switch = int(input('輸入0關閉程式:'))
+            if switch == 0:
+                print('程式關閉中.....')
+            else:
+                print('錯誤輸入!')
+        except:
+            print('錯誤輸入!')
 def main():
     global acc #存登入資訊
+    global switch
     acc = howtologin()
     t_tmp = list()
     for i in driver:
@@ -357,4 +382,15 @@ def main():
     thread[0].start()
     thread[1].start()
     thread[2].start()
+    thread[3].start()
+    while True:
+        if switch == 0:
+            thread[0].join()
+            thread[1].join()
+            thread[2].join()
+            thread[3].join()
+            print('成功關閉程式.....')
+            break
+        else:
+            pass
 main()
