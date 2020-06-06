@@ -158,6 +158,7 @@ def relogin(acc_type,driver):
         driver.refresh()
         wait('div.sa_sn.float_left.imp.gogo',driver)
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
+@retry
 def autoperk(type,isgold,driver):#自動升技
     global acc
     driver.get('https://rivalregions.com/')
