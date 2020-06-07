@@ -13,10 +13,11 @@ from retrying import retry
 global switch
 switch = 1
 chrome_options = Options()
-chrome_options.add_argument('window-size=1920,1080')
-chrome_options.add_argument('headless')
+chrome_options.add_argument('window-size=1280,720')
 chrome_options.add_argument('log-level=3')
 chrome_options.add_argument('disable-gpu')
+chrome_options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'")
+chrome_options.add_argument('headless')
 path = 'chromedriver.exe'
 #開啟CHROME
 def driver_create(q):
@@ -133,8 +134,8 @@ def login(account,username,password,driver):#登入
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
         while switch:
             try:
-                wait('//*[@id="Email"]',driver)
-                email = driver.find_element_by_xpath('//*[@id="Email"]')
+                wait('//*[@id="identifierId"]',driver)
+                email = driver.find_element_by_xpath('//*[@id="identifierId"]')
                 email.send_keys(username)
                 email.send_keys(Keys.ENTER)#enter
                 break
@@ -142,8 +143,8 @@ def login(account,username,password,driver):#登入
                 print('錯誤!重新登入中')
         while switch:
             try:
-                wait('//*[@id="password"]',driver)#等待下個頁面跳出
-                pas = driver.find_element_by_xpath('//*[@id="password"]')
+                wait('//*[@id="password"]/div[1]/div/div[1]/input',driver)#等待下個頁面跳出
+                pas = driver.find_element_by_xpath('//*[@id="password"]/div[1]/div/div[1]/input')
                 pas.send_keys(password)
                 pas.send_keys(Keys.ENTER)
                 break
