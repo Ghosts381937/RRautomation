@@ -15,7 +15,6 @@ switch = 1
 chrome_options = Options()
 chrome_options.add_argument('window-size=1280,720')
 chrome_options.add_argument('log-level=3')
-chrome_options.add_argument('disable-gpu')
 chrome_options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'")
 chrome_options.add_argument('headless')
 path = 'chromedriver.exe'
@@ -279,7 +278,7 @@ def autominegold(energy_num,driver):#自動挖金
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]',driver)
         if driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').text == '自動模式':
             click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]'))#自動模式
-        time.sleep(30)
+        time.sleep(60)
 def minegold(energy_num,driver):#手動挖金
     global switch
     while switch:
@@ -308,7 +307,7 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
             inputbox.clear()
             inputbox.send_keys(maxstation)
             click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]')) # 半自動
-        time.sleep(30)
+        time.sleep(60)
 def manualwar(weapon_type,weapon_num,driver):#手動演習
     chainfo = getchainfo(driver)
     weapon_buy(weapon_type,weapon_num,chainfo,driver)
