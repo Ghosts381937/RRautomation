@@ -64,11 +64,11 @@ def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒
             WebDriverWait(driver,10).until(
                 EC.presence_of_element_located((By.XPATH,xpath))
             )
+            time.sleep(2)
             break
         except:
             count = count + 1
             driver.refresh()
-    time.sleep(2)
 def ispremium(driver):#高級會員回傳1,否則回傳0
     #確保連結在遊戲主頁面
     wait('//*[@id="header_money"]/div',driver)
@@ -358,11 +358,18 @@ def thread_create(arg1,arg2,arg3,mode):#創建執行緒
     return [t1,t2,t3,t4]
 def thread_kill():
     global switch
+    global thread
     while switch:
         try:
             switch = int(input('輸入0關閉程式:'))
             if switch == 0:
                 print('程式關閉中.....')
+                thread[0].join()
+                thread[1].join()
+                thread[2].join()
+                for browser in driver:
+                    browser.close()
+                print('成功關閉程式.....')
             else:
                 print('錯誤輸入!')
         except:
@@ -370,14 +377,15 @@ def thread_kill():
 def main():
     global acc #存登入資訊
     global switch
+    global thread
     acc = howtologin()
     t_tmp = list()
     for i in driver:
         t = threading.Thread(target=login,args=(acc[0],acc[1],acc[2],i))
         t.start()
         t_tmp.append(t)
-    for thread in t_tmp:
-        thread.join()
+    for t in t_tmp:
+        t.join()
     mode = ispremium(driver_perk)
     print('升級技能:')
     perk = howtoperk()
@@ -390,16 +398,5 @@ def main():
     thread[1].start()
     thread[2].start()
     thread[3].start()
-    while True:
-        if switch == 0:
-            thread[0].join()
-            thread[1].join()
-            thread[2].join()
-            thread[3].join()
-            for browser in driver:
-                browser.close()
-            print('成功關閉程式.....')
-            break
-        else:
-            pass
+    thread[3].join()
 main()
