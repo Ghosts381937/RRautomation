@@ -4,32 +4,37 @@ from selenium.webdriver.common.by import By #定位元素
 #以下2個套件寫出wait函示
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
-import time
-import math
+from selenium.webdriver.chrome.options import Options#給定瀏覽器設定值
+import time #用於time.sleep()
+import math 
 import threading#多執行緒套件
 from queue import Queue #處理執行緒回傳值
-from retrying import retry
-global switch
+from retrying import retry #function跳出錯誤時重新執行
+from getpass import getpass 
+global switch #控制while迴圈的變數(搭配後方thread_kill)
 switch = 1
 chrome_options = Options()
-chrome_options.add_argument('window-size=1280,720')
-chrome_options.add_argument('log-level=3')
+chrome_options.add_argument('window-size=1280,720') 
+chrome_options.add_argument('log-level=3') #調高回傳log會顯示的等級
 chrome_options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'")
+chrome_options.add_argument('headless') #無視窗
 path = 'chromedriver.exe'
 #開啟CHROME
 def driver_create(q):
-    driver = webdriver.Chrome(options=chrome_options,executable_path=path)
+    driver = webdriver.Chrome(options=chrome_options,executable_path=path) #開始瀏覽器
     driver.get('https://rivalregions.com/')#開啟RR
-    q.put(driver)
+    q.put(driver) #從執行緒拿回傳值
 t_tmp = list()
-q = Queue()
+q = Queue() #queue型態
+#開啟3個driver_create執行緒並放入t_tmp
 for i in range(3):
     t0 = threading.Thread(target=driver_create,args=(q,))
     t0.start()
     t_tmp.append(t0)
+#依序停止t_tmp裡的3個執行緒
 for thread in t_tmp:
     thread.join()
+#從q依序拿創建好的瀏覽器出來
 driver_perk = q.get()
 driver_gold = q.get()
 driver_war = q.get()
@@ -41,7 +46,7 @@ def iselemexit(xpath,driver):#檢測該元素是否存在
         return True
     except:
         return False
-def click(elem):
+def click(elem): #點擊該元素(6次點擊失敗後跳出)
     global switch
     count=0
     while switch:
@@ -53,7 +58,7 @@ def click(elem):
         except:
             count=count+1
             time.sleep(1)
-def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒後refresh
+def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒後refresh(最多等30秒)
     global switch
     count = 0
     while switch:
@@ -110,7 +115,7 @@ def howtologin():
         except:
             print('錯誤輸入')
     username = input('請輸入帳號:')
-    password = input('請輸入密碼:')
+    password = getpass('請輸入密碼:')
     return [account,username,password]
 def login(account,username,password,driver):#登入
     global switch
@@ -163,13 +168,15 @@ def login(account,username,password,driver):#登入
             except:
                 print('錯誤!重新登入中')
 def relogin(acc_type,driver):
-    if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
+    if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼再登入狀態時才會出現
         pass
     else:
+        print('重新登入中')
+        driver.get('https://rivalregions.com/')
         driver.refresh()
         wait('div.sa_sn.float_left.imp.gogo',driver)
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
-@retry()
+@retry()#function跳出錯誤時重新執行
 def autoperk(type,isgold,driver):#自動升技
     global switch
     global acc
@@ -224,8 +231,9 @@ def Energy_buy(energy_num,driver):#買能量飲料
         click(driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[4]/div'))# 輸入並購買   
     else:
         pass
-def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
+def weapon_buy(weapon_type,weapon_num,driver):#買武器
     global maxstation
+    global chainfo
     damage = [75,2000,6000]#3種武器分別的傷害
     maxstation = math.floor(math.floor(300/single_costenergy(chainfo['end']))*(1000+50*chainfo['lv'])/damage[int(weapon_type-1)])#最大派兵量={(總能量/單次派兵消耗能量)*該等級攻擊力}/該武器提供的攻擊力
     relogin(acc[0],driver)
@@ -289,13 +297,12 @@ def minegold(energy_num,driver):#手動挖金
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))# 生產
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]',driver)
         click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
-@retry(tries = 5)
+@retry()
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global switch
     global maxstation
-    chainfo = getchainfo(driver)
     while switch:
-        weapon_buy(weapon_type,weapon_num,chainfo,driver)
+        weapon_buy(weapon_type,weapon_num,driver)
         wait('//*[@id="header_menu"]/div[16]',driver)
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
         wait('//*[@id="content"]/div[4]/div[2]/div',driver)
@@ -308,8 +315,7 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
             click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]')) # 半自動
         time.sleep(60)
 def manualwar(weapon_type,weapon_num,driver):#手動演習
-    chainfo = getchainfo(driver)
-    weapon_buy(weapon_type,weapon_num,chainfo,driver)
+    weapon_buy(weapon_type,weapon_num,driver)
     wait('//*[@id="header_menu"]/div[16]',driver)
     click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
     wait('//*[@id="content"]/div[4]/div[2]/div',driver)
@@ -377,6 +383,7 @@ def main():
     global acc #存登入資訊
     global switch
     global thread
+    global chainfo
     acc = howtologin()
     t_tmp = list()
     for i in driver:
@@ -386,6 +393,7 @@ def main():
     for t in t_tmp:
         t.join()
     mode = ispremium(driver_perk)
+    chainfo = getchainfo(driver_war)
     print('升級技能:')
     perk = howtoperk()
     print('挖金礦:')
