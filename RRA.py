@@ -16,7 +16,6 @@ chrome_options = Options()
 chrome_options.add_argument('window-size=1280,720')
 chrome_options.add_argument('log-level=3')
 chrome_options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'")
-chrome_options.add_argument('headless')
 path = 'chromedriver.exe'
 #開啟CHROME
 def driver_create(q):
@@ -58,7 +57,7 @@ def wait(xpath,driver):#當該xpath出現時繼續下個動作,否則等完10秒
     global switch
     count = 0
     while switch:
-        if count>5:
+        if count>2:
             break
         try:
             WebDriverWait(driver,10).until(
@@ -165,12 +164,12 @@ def login(account,username,password,driver):#登入
                 print('錯誤!重新登入中')
 def relogin(acc_type,driver):
     if iselemexit('//*[@id="header_my_avatar"]',driver):#左上頭貼
-        return False
+        pass
     else:
         driver.refresh()
         wait('div.sa_sn.float_left.imp.gogo',driver)
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
-@retry
+@retry()
 def autoperk(type,isgold,driver):#自動升技
     global switch
     global acc
@@ -268,7 +267,7 @@ def weapon_buy(weapon_type,weapon_num,chainfo,driver):#買武器
             num.clear()
             num.send_keys(weapon_num)
             click(driver.find_element_by_xpath('//*[@id="storage_market"]/div[2]/div[1]/div[6]/div[1]'))
-@retry
+@retry()
 def autominegold(energy_num,driver):#自動挖金
     global switch
     while switch:
@@ -290,7 +289,7 @@ def minegold(energy_num,driver):#手動挖金
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))# 生產
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]',driver)
         click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
-@retry
+@retry(tries = 5)
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global switch
     global maxstation
