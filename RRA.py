@@ -16,8 +16,8 @@ switch = 1
 chrome_options = Options()
 chrome_options.add_argument('window-size=1280,720') 
 chrome_options.add_argument('log-level=3') #調高回傳log會顯示的等級
+chrome_options.add_argument('headless')
 chrome_options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'")
-chrome_options.add_argument('headless') #無視窗
 path = 'chromedriver.exe'
 #開啟CHROME
 def driver_create(q):
@@ -176,6 +176,7 @@ def relogin(acc_type,driver):
         driver.refresh()
         wait('div.sa_sn.float_left.imp.gogo',driver)
         click(driver.find_element_by_tag_name('div.sa_sn.float_left.imp.gogo'))
+        wait('//*[@id="header_my_avatar"]',driver)
 @retry()#function跳出錯誤時重新執行
 def autoperk(type,isgold,driver):#自動升技
     global switch
