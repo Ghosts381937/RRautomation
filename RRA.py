@@ -16,7 +16,7 @@ switch = 1
 chrome_options = Options()
 chrome_options.add_argument('window-size=1280,720') 
 chrome_options.add_argument('log-level=3') #調高回傳log會顯示的等級
-chrome_options.add_argument('headless')
+chrome_options.add_argument('blink-settings=imagesEnabled=false')#關閉圖片載入
 chrome_options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'")
 path = 'chromedriver.exe'
 #開啟CHROME
@@ -287,17 +287,20 @@ def autominegold(energy_num,driver):#自動挖金
         if driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]').text == '自動模式':
             click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[2]'))#自動模式
         time.sleep(60)
+@retry()
 def minegold(energy_num,driver):#手動挖金
     global switch
     while switch:
         Energy_buy(energy_num,driver)
-        driver.get(('https://rivalregions.com/'))
         wait('//*[@id="s_index"]',driver)
         if int(driver.find_element_by_xpath('//*[@id="s_index"]').text)<200 and iselemexit('//*[@id="header_my_fill_bar"]',driver):
             click(driver.find_element_by_xpath('//*[@id="header_my_fill_bar"]'))
+        wait('//*[@id="header_menu"]/div[9]',driver)
         click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[9]'))# 生產
         wait('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]',driver)
         click(driver.find_element_by_xpath('//*[@id="content"]/div[6]/div[2]/div[2]/div[3]/div[1]'))#普通挖金
+        time.sleep(60)
+        
 @retry()
 def halfautowar(weapon_type,weapon_num,driver):#半自動演習
     global switch
@@ -315,14 +318,23 @@ def halfautowar(weapon_type,weapon_num,driver):#半自動演習
             inputbox.send_keys(maxstation)
             click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[4]')) # 半自動
         time.sleep(60)
+@retry()
 def manualwar(weapon_type,weapon_num,driver):#手動演習
-    weapon_buy(weapon_type,weapon_num,driver)
-    wait('//*[@id="header_menu"]/div[16]',driver)
-    click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
-    wait('//*[@id="content"]/div[4]/div[2]/div',driver)
-    click(driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div')) # 軍事演習
-    wait('//*[@id="send_b_wrap"]/div[1]',driver)
-    click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[1]'))#派兵
+    global switch
+    global maxstation
+    while switch:
+        weapon_buy(weapon_type,weapon_num,driver)
+        wait('//*[@id="header_menu"]/div[16]',driver)
+        click(driver.find_element_by_xpath('//*[@id="header_menu"]/div[16]')) # 戰爭
+        wait('//*[@id="content"]/div[4]/div[2]/div',driver)
+        click(driver.find_element_by_xpath('//*[@id="content"]/div[4]/div[2]/div')) # 軍事演習
+        wait('//*[@id="header_slide_inner"]/div[2]/h1/div[2]',driver)
+        if iselemexit('//*[@id="send_b_wrap"]/div[1]',driver):
+                inputbox = driver.find_element_by_xpath('//*[@id="header_slide_inner"]/div[4]/div[2]/div[3]/input')
+                inputbox.clear()
+                inputbox.send_keys(maxstation)
+                click(driver.find_element_by_xpath('//*[@id="send_b_wrap"]/div[1]'))#派兵
+        time.sleep(60)
 def howtobuy_energy():#沒能量飲料時購買數量
     global switch
     while switch:
